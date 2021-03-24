@@ -59,3 +59,11 @@
 	color: #555;
 	pointer-events: none;
 }
+.message-title {
+  text-align: center;
+  display:block;
+  width: 100%;
+}
+.message-icon {
+	text-align: center;
+}

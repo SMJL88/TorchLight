@@ -124,5 +124,13 @@
 	"torchlight.torchType.customAnimationIntensity.name": "Custom Torch Animation Intensity",
 	"torchlight.torchType.customAnimationIntensity.hint": "Choose the animation intensity of the custom torch.",
 	"torchlight.nameConsumableTorch.name": "Consumable Item for Torch",
-	"torchlight.nameConsumableTorch.hint": "Name of the inventory item to check and potentially consume when a torch is lit."
+	"torchlight.nameConsumableTorch.hint": "Name of the inventory item to check and potentially consume when a torch is lit.",
+	
+	"torchlight.message.NoTorch.name": "No Torch in Inventory message send to chat",
+	"torchlight.message.NoTorch.hint": "This message will be send on chat when the Actor do not have a Torch",
+	
+	"torchlight.message.turnOff.name": "Turn Off Chat Message",
+	"torchlight.message.turnOff.hint": "This message will be send on chat when the Actor turn off a torch or a lantern",
+	"torchlight.message.turnOn.name": "Turn On Chat Message",
+	"torchlight.message.turnOn.hint": "This message will be send on chat when the Actor turn on a torch or a lantern"
 }
