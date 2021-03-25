@@ -513,7 +513,6 @@ class TorchLight {
 		// This also returns true if the game system is not D&D 5e...
 		function canCastLight() {
 			let actor = game.actors.get(data.actorId);
-			//console.log("testeeeesssssssssssssssssssssssssssssssssssssssssssssssssssse");
 			if (actor === undefined)
 				return false;
 			let hasLight = false;
@@ -524,9 +523,7 @@ class TorchLight {
 							if (item.type === 'ability') {
 								if (item.name.toLowerCase() === spellName.toLowerCase()) {
 									hasLight = true;
-									//console.log("testeeeee");
 								}
-
 							}
 						});
 					});
