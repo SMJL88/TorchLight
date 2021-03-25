@@ -51,6 +51,11 @@ class TorchLight {
 					} else {
 						// The token does not have the light spell on
 						console.log("Clicked on the light button when the light is off.");
+						ChatMessage.create({
+							user: game.user._id,
+							speaker: game.actors.get(data.actorId),
+							content: '<div class="control-icon torchlight message-title" ><i class="fas fa-sun message-icon"></i></div><span>'+game.settings.get("torchlight", "castSpellMessage")+' '+getSpellName()+'</span> '
+						});
 						statusLight = true;
 						await app.object.setFlag("torchlight", "statusLight", true);
 						tbuttonLight.addClass("active");
@@ -157,7 +162,7 @@ class TorchLight {
 						console.log("Clicked on the lantern when the lantern is off.");
 						// Checks whether the character can consume an oil flask
 						if (consumeItem(game.settings.get("torchlight", "nameConsumableLantern"))) {
-							
+
 							ChatMessage.create({
 								user: game.user._id,
 								speaker: game.actors.get(data.actorId),
@@ -347,11 +352,11 @@ class TorchLight {
 			if (!noCheck)
 				noCheck = (data.isGM && !game.settings.get("torchlight", "dmAsPlayer")) || !game.settings.get("torchlight", "checkAvailability");
 
-			if (noCheck || canCastLight())
+			if (noCheck || canCastLight()) {
 				enableTorchlightButton(tbuttonLight);
-			else
+			} else {
 				disableTorchlightButton(tbuttonLight);
-
+			}
 			if (noCheck || (hasItemInInventory(game.settings.get("torchlight", "nameConsumableLantern")) && hasLanternItemInInventory()))
 				enableTorchlightButton(tbuttonLantern);
 			else
@@ -508,15 +513,32 @@ class TorchLight {
 		// This also returns true if the game system is not D&D 5e...
 		function canCastLight() {
 			let actor = game.actors.get(data.actorId);
+			//console.log("testeeeesssssssssssssssssssssssssssssssssssssssssssssssssssse");
 			if (actor === undefined)
 				return false;
 			let hasLight = false;
-			actor.data.items.forEach(item => {
-				if (item.type === 'spell') {
-					if (item.name === 'Light')
-						hasLight = true;
-				}
-			});
+			let spells = game.settings.get("torchlight", "nameSpellList").split(";");
+			if (game.system.id === 'swade' ) {
+					spells.forEach( spellName => {
+						actor.data.items.forEach(item => {
+							if (item.type === 'ability') {
+								if (item.name.toLowerCase() === spellName.toLowerCase()) {
+									hasLight = true;
+									//console.log("testeeeee");
+								}
+
+							}
+						});
+					});
+			} else {
+				actor.data.items.forEach(item => {
+					if (item.type === 'spell') {
+						if (item.name === 'Light')
+							hasLight = true;
+					}
+				});
+			}
+
 			return hasLight;
 		}
 
@@ -535,6 +557,37 @@ class TorchLight {
 			});
 			return hasItem;
 		}
+		function getSpellName() {
+			let actor = game.actors.get(data.actorId);
+			if (actor === undefined)
+				return false;
+			let spellName = '';
+			let spells = game.settings.get("torchlight", "nameSpellList").split(";");
+			if (game.system.id === 'swade' ) {
+					spells.forEach( spellNameCompare => {
+						actor.data.items.forEach(item => {
+							if (item.type === 'ability') {
+								console.log(item.name);
+								console.log(spellNameCompare);
+								if (item.name.toLowerCase() === spellNameCompare.toLowerCase()) {
+									spellName = item.name;
+									return spellName;
+								}
+
+							}
+						});
+					});
+			} else {
+				actor.data.items.forEach(item => {
+					if (item.type === 'spell') {
+						if (item.name === 'Light')
+							spellName = item.Name;
+					}
+				});
+			}
+			return spellName;
+
+		}
 		function getLanternItemName() {
 			let actor = game.actors.get(data.actorId);
 			let nameItem = '';
@@ -547,9 +600,9 @@ class TorchLight {
 						if (item.data.quantity > 0)
 							nameItem = item.name;
 					}
-				});	
+				});
 			});
-			return nameItem;	
+			return nameItem;
 		}
 		function hasLanternItemInInventory() {
 			let actor = game.actors.get(data.actorId);
@@ -563,7 +616,7 @@ class TorchLight {
 						if (item.data.quantity > 0)
 							hasItem = true;
 					}
-				});	
+				});
 			});
 			return hasItem;
 		}
@@ -712,7 +765,7 @@ Hooks.once("init", () => {
 			default: false,
 			type: Boolean
 		});
-	} 
+	}
 	// Light Parameters
 	game.settings.register("torchlight", "lightBrightRadius", {
 		name: game.i18n.localize("torchlight.lightBrightRadius.name"),
@@ -966,7 +1019,7 @@ Hooks.once("init", () => {
 			default: "Oil (flask)",
 			type: String
 		});
-	} 
+	}
 	if (game.system.id === 'dnd5e' || game.system.id === 'swade') {
 		game.settings.register("torchlight", "nameLanternList", {
 			name: game.i18n.localize("torchlight.nameLantern.name"),
@@ -1119,6 +1172,25 @@ Hooks.once("init", () => {
 		                type: String,
 		                default: "Turn ON"
 		        });
+
+	game.settings.register("torchlight", "nameSpellList", {
+							name: game.i18n.localize("torchlight.nameSpell.name"),
+							hint: game.i18n.localize("torchlight.nameSpell.hint"),
+							scope: "world",
+							config: true,
+							default: "Light",
+							type: String
+	});
+
+	game.settings.register("torchlight", "castSpellMessage", {
+							name: game.i18n.localize("torchlight.message.spell.name"),
+							hint: game.i18n.localize("torchlight.message.spell.hint"),
+							scope: "world",
+							config: true,
+							default: "Cast Spell",
+							type: String
+	});
+
 	if (game.system.id === 'dnd5e' || game.system.id === 'swade' ) {
 		game.settings.register("torchlight", "nameConsumableTorch", {
 			name: game.i18n.localize("torchlight.nameConsumableTorch.name"),
@@ -1128,7 +1200,7 @@ Hooks.once("init", () => {
 			default: "Torch",
 			type: String
 		});
-	} 
+	}
 });
 
 console.log("--- Flame on!");
